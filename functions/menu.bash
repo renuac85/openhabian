@@ -31,7 +31,6 @@ Menu 50 provides options to backup and restore either your openHAB configuration
 show_main_menu() {
   local choice
   local version
-  local jdkBin
   local javaVersion
 
 
@@ -75,8 +74,7 @@ show_main_menu() {
         return 255
     fi
 
-    jdkBin="$(find /opt/jdk/*/bin ... -print -quit)"
-    javaVersion="$("${jdkBin}"/java -version |& grep -m 1 -o "[0-9]\{0,3\}\.[0-9]\{0,3\}\.[0-9]\{0,3\}[\.+][0-9]\{0,3\}" | head -1|cut -d '.' -f1)"
+    javaVersion="$(java -version |& grep -m 1 -o "[0-9]\{0,3\}\.[0-9]\{0,3\}\.[0-9]\{0,3\}[\.+][0-9]\{0,3\}" | head -1|cut -d '.' -f1)"
     if [[ $(apt-cache madison openhab | head -n 1 | awk '{ print $3 }' | cut -d'.' -f1) = 4 ]]; then
       if [[ $javaVersion -lt 17 ]] ; then
         update_config_java "17"
