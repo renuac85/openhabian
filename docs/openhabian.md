@@ -142,7 +142,8 @@ Should you still be running an older distribution, we recommend not to upgrade t
 
 ### 64 bit?
 RPi 3 and newer have a 64 bit processor. There's openHABian images available in both, 32 and 64 bit.
-There's cons to both variants. Choose yours based on your hardware and primary use case.
+There's cons to both variants. Choose yours based on your hardware and primary use case. Please be aware that you cannot change once you decided in favor of either 32 or 64 bit. Should you need to revoke your choice, you should export/backup your config and install a fresh system, then import your config there.
+
 On 32 bit, JS rules are reported to be annoyingly slow on first startup and in some Blockly development cases. That's a clear nuisance but at least it's not mission critical.
 Running in 64 bit on the other hand requires all adjacent and underlying software to be fully compatible, too, so overall likelihood of encountering issues along the way is higher on a 64 bit OS.
 You might want to be running some older or some non official addons that will not work on 64 bit yet.
@@ -578,4 +579,3 @@ See the [README](https://github.com/openhab/openhabian/blob/main/README.md#hardw
 openHABian is developed for Debian based systems.
 If your operating system is based on these or if your hardware supports one, your chances are high openHABian can be used.
 Check out the [Manual Setup](#manual-setup) instructions for guidance and consult the [debug guide](openhabian-DEBUG.md) if you run into problems.
-Do not hesitate to ask for help on the [openHABian community forum](https://community.openhab.org/)!
