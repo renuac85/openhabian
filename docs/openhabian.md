@@ -32,13 +32,13 @@ It provides:
 
 ## Features
 
-Out of the box, the openHABian image provides lots of useful Linux tools:
+The openHABian image provides lots of useful Linux tools out of the box:
 
--   Hassle-free setup without a display or keyboard, connected via Ethernet or [Wi-Fi](#wi-fi-based-setup-notes)
+-   Fully automated hassle-free setup without a need for a display or keyboard, connected via Ethernet or [Wi-Fi](#wi-fi-based-setup-notes)
 -   All versions of openHAB to select from, including the latest stable one as the default
--   OpenJDK 11 or 17
+-   several Java options
 -   [openHABian Configuration Tool](#openhabian-configuration-tool) including updater functionality
--   [SD card mirroring](openhabian.md#auto-backup) and [Amanda Backup](openhabian-amanda.md) to boost system availability
+-   [SD card mirroring](openhabian.md#SD-mirroring) and [Amanda Backup](openhabian-amanda.md) to boost system availability
 -   Web based openHAB Log Viewer (based on [frontail](https://github.com/mthenw/frontail))
 -   Samba file sharing [pre-configured ready to use shares](https://www.openhab.org/docs/installation/linux.html#mounting-locally)
 -   Login information screen, powered by [FireMotD](https://github.com/OutsideIT/FireMotD)
@@ -57,26 +57,16 @@ The included **openHABian Configuration Tool** [`openhabian-config`](#openhabian
 -   Configure Raspberry Pi specific functions
     -   Prepare the serial port for the use with extension boards like RaZberry, Enocean Pi, ...
     -   Use zram to mitigate SD wear due to excessive writes
+    -   mirror the SD card
     -   Move the system partition to an external USB stick or drive
-
-... and much more
 
 ## On openHAB 4, 3 and 2
 openHABian will install **openHAB 4** and Java 17 by default.
-openHAB 2 will continue to work on openHABian, but openHAB 2 support is no longer maintained.
-If you need openHAB 2 support please use the `legacy` branch of openHABian.
-You can switch branches using menu option 01 in `openhabian-config` but ATTENTION you cannot up- or downgrade this way and you cannot arbitrarily change versions.
-There's a high risk you mess up your system if you do.
-
-### Deploying openHAB 2 or 3
-The openHABian image will install openHAB 4 by default, to have it install openHAB 2 or 3 right from the beginning, set `clonebranch=legacy` or `clonebranch=openHAB3` in `openhabian.conf` before first boot.
-
-## Upgrading openHAB 2 to current openHAB
-For openHABian users still running openHAB 2.X, `openhabian-config` offers to migrate the openHABian environment and install current openHAB for you.
-using menu option 42. Beware you cannot downgrade again.
+The openHABian image will install openHAB 4 by default, to have it install openHAB 3 right from the beginning, set `clonebranch=openHAB3` or in `openhabian.conf` on the first SD partition before first boot. Use `clonebranch=legacy` to get openHAB 2.
+You can switch branches using menu option 01 in `openhabian-config` but ATTENTION you cannot up- or downgrade this way, use the 03 and 4X options.
 
 ::: warning No downgrades
-Take an openHAB config backup BEFORE you upgrade from openHAB v2 to v3. You should also take a system level backup!
+Take an openHAB config backup BEFORE you upgrade from openHAB 3 to 4. You should also make a system level copy of your SD card.
 :::
 
 Menu option 42 can also do the downgrade and change the _environment_ back to match openHAB 2 but ATTENTION it'll only exchange the OS setup and the openHAB packages.
@@ -103,42 +93,39 @@ So if you choose to deviate from the standard openHABian installation (e.g. you 
 
 ## Hardware
 ### Hardware recommendation
-Let's put this first: our current recommendation is to get a RPi 4 with 2 or 4 GB of RAM, a 3A power supply and a 16 or 32 GB SD card.
-Prefer getting a card named with a postfix like "Endurance" (e.g. "SanDisk MAX ENDURANCE" or "Kingston High Endurance") because it
-can handle more write cycles hence it'll be more enduring under openHAB\'s use conditions.
-To make use of the ["auto backup" feature](openhabian.md#auto-backup), get another SD card, preferrably same model as but at least the size of your internal one, and a USB card reader.
+Let's put this first: our current recommendation is to get a RPi 4 with 2 or (better) 4 GB of RAM, a 3A power supply and an "Endurance" SD card.
+Cards named "Endurance" can handle more write cycles and will be more enduring under openHAB\'s use conditions.
+Prepare to make use of the [SD mirroring feature](openhabian.md#SD-mirroring), get a 2nd SD card right away, same model or at least the size of your internal one, plus a USB card reader.
 
 ### Hardware support
 As of openHABian version 1.6 and later, all Raspberry Pi models are supported as hardware.
+The new RPi 5 is not fully supported.
 Anything x86 based may work or not.
 Anything else ARM based such as ODroids, OrangePis and the like may work or not.
 NAS servers such as QNAP and Synology boxes will not work.
 Support for PINEA64 was dropped.
 
-We strongly recommend that users choose Raspberry Pi 2, 3 or 4 systems that have 1 GB of RAM or more.
+We strongly recommend Raspberry Pi 2, 3 or 4 systems that have 1 GB of RAM or more.
 RPi 1 and 0/0W just have a single CPU core and only 512 MB of RAM. The RPi0W2 has 4 cores but only 512 MB as well.
 512 MB can be sufficient to run a smallish openHAB setup, but it will not be enough to run a full-blown system with many bindings and memory consuming openHABian features/components such as zram or InfluxDB.
 We do not actively prohibit installation on any hardware, including unsupported systems, but we might skip or deny to install specific extensions such as those memory hungry applications named above.
 
 Supporting hardware means testing every single patch and every release.
 There are simply too many combinations of SBCs, peripherals and OS flavors that maintainers do not have available, or, even if they did, the time to spend on the testing efforts that is required to make openHABian a reliable system.
-Let's make sure you understand the implications of these statements: it means that to run on hardware other than RPi 2/3/4 or (bare metal that means NOT virtualized) x86 Debian may work but this is **not** supported.
+It means that to run on hardware other than RPi 2/3/4 or (bare metal that means NOT virtualized) x86 Debian may work but this is **not** a supported setup.
+Please stay with a supported version. This will help you and those you will want to ask for help on the forum focus on a known set of issues and solutions.
 
-It may turn out to when you install openHABian on unsupported hardware.
-However, if it does not, it's your very own problem to deal with that.
-You are invited to find out what needs to be adapted and contribute code to fix that back to the community with a GitHub pull request for anyone to benefit.
-That's the thing about Open Source. 
-We'll be happy to include that in openHABian so you can use your box with openHABian unless there's a valid reason to change or remove it.
-However, that does not make your box a "supported" one as we don't have it available for our further development and testing.
-So there remains a risk that future openHABian releases will fail to work on your SBC because we changed a thing that broke support for your HW - unintentionally, however inevitably.
+At the time of writing, RPi5 are not fully supported as they require the Raspi OS to be based on latest Debian `bookworm`. There's an experimental based image available that should work for your RPi, but for now there's known issues at least with Wi-Fi and the Hotspot function.
 
 For ARM hardware that we don't support, you can try any of the [fake hardware parameters](openhabian.md#fake-hardware-mode) to 'simulate' RPi hardware and Raspberry Pi OS.
 
 #### Hardware modifications
 Plugging in HATs like an UPS or USB sticks or even SSDs for storage is fine, but we do not support attaching any hardware if that requires any sort of software or configuration changes on the OS part of openHABian.
 To put it straight: we don't recommend SSDs and do not support attaching an SSD and move the system over there.
-If you know Linux well enough to manually apply all the required modifications, feel free to do so but please be aware that this is a completely untested option that may work or not and what's even more important: it is unsupported. Don't ask for help if you run into trouble.
+If you know Linux well enough to manually apply all the required modifications, feel free to do so but please be warned that this is a completely untested option that may work or not and what's even more important: it is unsupported. Don't ask for help if you run into trouble.
 Also remember that any future changes to openHABian (which is what you get when you upgrade as you are recommended to do on every start of the `openhabian-config` tool) can interfere with any such modification of yours so while any such mod may work for the time being you apply it, it may break your box and openHAB experience anytime in the future.
+Anybody afraid of SD card issues, use the [SD mirroring feature](openhabian.md#SD-mirroring) to mitigate.
+This will provide you with a secondary, up to date SD card, available for swapping at any time.
 
 ### OS support
 Going beyond what the RPi image provides, as a manually installed set of scripts, we support running openHABian on x86 hardware on generic Debian.
@@ -147,23 +134,25 @@ These are what we develop and test openHABian against.
 We provide code that is reported "as-is" to run on Ubuntu but we do **not support Ubuntu** so please don't open issues for this (PRs then again are welcome).
 Several optional components such as WireGuard or Homegear are known to expose problems on Ubuntu.
 
-We expect you to use the current stable distribution `bullseye` for Debian (x86). The current Raspberry Pi image is based on this, too.
-To install openHABian on anything older or newer may work or not. `bookworm` may work but it is not yet supported.
-If you do and encounter issues, you may need to upgrade first or to live with the consequences of running an OS on the edge of software development.
-Note: With openHAB 4 and Java 17, `buster` is no longer reported.
-There'll be issues when you upgrade Java 11->17 on `buster` so upgrade your OS to `bullseye` before attempting to upgrade openHAB.
+You need to use the `bullseye` distribution for Debian (x86). 
+
+Note with openHAB 4 and Java 17, `buster` is no longer supported and there'll be issues when you attempt upgrading Java 11->17 on `buster` so move to `bullseye` before attempting to upgrade openHAB to version 4.
+Should you still be running an older distribution, we recommend not to upgrade the distro but to re-install using the latest openHABian image and import your config instead.
+`bookworm` is not yet fully supported. There's known issues at least with a Wi-Fi setup.
 
 ### 64 bit?
-RPi 3 and 4 have a 64 bit processor and you may want to run openHAB in 64 bit.
-Be aware that running in 64 bit has no relevant advantages but a major drawback: increased memory usage.
-That is not a good idea on a heavily memory constrained platform like a RPi.
-
-On x86 hardware, 64 bit is the standard.
+RPi 3 and newer have a 64 bit processor. There's openHABian images available in both, 32 and 64 bit.
+There's cons to both variants. Choose yours based on your hardware and primary use case.
+On 32 bit, JS rules are reported to be annoyingly slow on first startup and in some Blockly development cases. That's a clear nuisance but at least it's not mission critical.
+Running in 64 bit on the other hand requires all adjacent and underlying software to be fully compatible, too, so overall likelihood of encountering issues along the way is higher on a 64 bit OS.
+You might want to be running some older or some non official addons that will not work on 64 bit yet.
+Plus, 64 bit always has one major drawback: increased memory usage. That is not a good idea on heavily memory constrained platforms like these. If you want to go with 64 bit, ensure your RPi has a mimimum of 2 GB, 4 will put you on the safe side.
+On x86 hardware, it's all 64 bit but that in turn once more increases memory usage. A NUC to run on should have no less than 8 GB.
 
 ### Networking
 You need to prepare your local network so you eventually need to configure your Internet router before an openHABian installation.
 For image based installations, openHABian re-uses the TCP/IP networking setup Raspberry Pi OS is coming with.
-The non-image (script-only) version of openHABian does not change anything about your existing OS' networking setup so you have to take care of that and prepare it yourself.
+The non-image (script-only) version of openHABian does not change anything about your existing OS' networking setup so you have to take care of that yourself before installing.
 
 A working DHCP server is a mandatory prerequisite to openHABian's networking setup.
 We recommend you configure your DHCP server to always assign the same IP based based on your RPi's MAC address.
@@ -193,7 +182,7 @@ The whole process will take some minutes, then openHAB and all other tools requi
 
 -   Make sure you meet the [hardware prerequisites](#hardware) first
 -   [Prepare your local router](#networking)
--   Write the image to your SD card using the official [Raspberry Pi Imager](https://www.raspberrypi.org/software/). openHABian can be selected via 'Other specific purpose OS / Home assistants and home automation'. Choose the 32bit version, it's more efficient !
+-   Write the image to your SD card using the official [Raspberry Pi Imager](https://www.raspberrypi.org/software/). openHABian can be selected via 'Other specific purpose OS / Home assistants and home automation'.
 -   Alternatively, you can [download the card image file](https://github.com/openhab/openhabian/releases) and use any flash tool such as [Etcher](https://www.balena.io/etcher/).
 -   Optionally, you can change a number of parameters *now* to affect the installation. See this section (https://www.openhab.org/docs/installation/openhabian.html#openhabian-conf). As a beginner or if in doubt what an option does, don't change anything.
 -   Insert the SD card into your Raspberry Pi. Connect your Ethernet or [configure Wi-Fi](#wi-fi-based-setup-notes) if you want to use that. **Do not attach a keyboard**. Power on and wait approximately 15-45 minutes for openHABian to do its magic. The system will be accessible by its IP or via the local DNS name `openhabian` and you can watch the install progress in your browser at [http://openhabian:81](http://openhabian:81). If for whatever reason networking does not work, openHABian will launch a [hotspot](#Wi-Fi-Hotspot) so if you see that, something's up with your networking.
@@ -333,7 +322,7 @@ openHABian has a number of features built in to enhance resilience:
     WARNING: power failure will result in some data to get lost (albeit the system should continue to run) so we recommend to also get an UPS.
     Zram is enabled by default for swap, logs and persistence data.
     You can toggle use in \[menu option 38\].
-2.  Mirror your SD card: see [auto backup](#auto-backup) documentation. You can activate mirroring using \[menu option 53\].
+2.  Mirror your SD card: see [auto backup](#SD-mirroring) documentation. You can activate mirroring using \[menu option 53\].
 3.  openHABian provides an option to move the root filesystem to USB-attached devices.
     See \[menu option 37\].
 
@@ -424,7 +413,11 @@ Mind you that if you intend to open an issue, we need you to provide the output 
 Auto backup is a marketing name for two distinct features that you can deploy in one go at _unattended_ installation time on a RPi (when you deploy the image).
 Technically it is a "low-cost" version of disk mirroring PLUS the setup of the Amanda backup system which all by itself has been available in a long time.
 So don't let the name confuse you. If you didn't choose to set this up at installation time, you can also individually select these functions via `openhabian-config` menu options 53 (mirroring) and 52 (Amanda).
-Note mirroring is untested (and hardly makes sense to deploy) if you don't run RPi hardware while Amanda is known to work on a lot of other hardware and is well meant to be used as the backup system there as well.
+Note mirroring is available on RPi hardware only while Amanda as the backup system is available on any openHABian-supported hardware-OS combo.
+
+#### SD mirroring
+SD cards are known to 'wear out' the more you write to them.
+The SD mirroring feature uses an USB-attached card writer to keep a 2nd SD card in (loose) sync with the internal card. In case of the primary SD card to fail, you can easily swap cards to relaunch your OH and get it working again within just minutes. You can even instruct others with physical access if you cannot be on site, and you can make use of this feature to create system copies that you can store off-site to recover your smart home server in case a disaster happens.
 
 To setup openHABian to automatically backup and mirror your internal SD card to an external storage unit, we suggest to use another SD card in an external card writer device so that in case your internal SD card fails, you can switch SD cards to get the system back up running fast.
 
